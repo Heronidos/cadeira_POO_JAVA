@@ -1,2 +1,6 @@
-/caelum/nbproject/private/
-/caelum/build/
+.gitignore
+/s02e01/nbproject/private/
+/s02e01/build/
+/caelum
+/s02e02/nbproject/private/
+/s02e02/build/
