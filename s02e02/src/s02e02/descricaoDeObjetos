@@ -1,0 +1,39 @@
+Objetos Reais:
+
+Video Game:
+Marca - String
+Modelo - String
+Preço - Float
+Ano de fab - Int
+Ligar()
+Desligar()
+Abrir_tampa()
+Fechar_tampa()
+
+Desenho:
+Tamanho - String
+Tipo de traço - String
+Valor - Float
+Prazo_de_entrega - Float
+
+Ilustrador:
+Tipo - String
+Preço da hora trabalhada - Float
+Cansado - Boleano
+Desenhar()
+Tomar_cafe()
+
+
+Objetos virtuais:
+
+Noite de Sono:
+Tipo - String
+Duração - Float
+Descansar()
+
+Role:
+Tipo - String
+Encontrar_a_glr()
+Comer()
+Jogar()
+Beber()
