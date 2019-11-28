@@ -1,4 +1,4 @@
-package s13.whatsapp;
+package s13.whatsapp.v2;
 
 import java.util.ArrayList;
 import java.util.Map;
@@ -59,6 +59,15 @@ class Grupo {
         retorno = this.msgNaCaixa.get(nomeUsuario).getMensagens().size();
         return retorno;
     }
+}
+
+class ConversaIndividual extends Grupo{
+
+    
+    public ConversaIndividual(String nome, Usuario remetente, Usuario correspondente) {
+        super(nome, remetente);
+    }
+
 }
 
 class Notificacao {
@@ -206,7 +215,7 @@ class Usuario {
 class Whatsapp {
 
     Repositorio<Usuario> usuarios;
-    Repositorio<Grupo> grupos;
+    Repositorio<Conversa> conversas ;
 
     public Whatsapp() {
         this.usuarios = new Repositorio<>("Usuario");
@@ -240,7 +249,6 @@ class Repositorio<T> {
     public Repositorio(String nomeTipo) {
         objetos = new TreeMap<>();
         this.nomeTipo = nomeTipo;
-
     }
 
     public void add(String chave, T coisa) {
@@ -276,7 +284,6 @@ class Repositorio<T> {
         }
         return retorno;
     }
-
 }
 
 public class Controller {
@@ -333,7 +340,5 @@ public class Controller {
                 System.out.println(e.getMessage());
             }
         }
-
     }
-
 }

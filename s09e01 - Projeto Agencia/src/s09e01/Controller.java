@@ -76,16 +76,24 @@ class Agencia {
         this.contas.add(corrente);
         this.contas.add(poupanca);
     }
+    public void atualizar(){
+        for (Conta c : contas){
+            c.atualizar();
+        }
+        
+    }
 }
 
 abstract class Conta {
 
-    static int nextId = 0;
+    private static int nextId = 0;
     private int identificador;
     private String tipo;
     private String dono;
     private double saldo;
 
+    abstract void atualizar();
+    
     public int getIdentificador() {
         return identificador;
     }
@@ -118,6 +126,15 @@ abstract class Conta {
         this.saldo = saldo;
     }
 
+    public static int getNextId() {
+        return nextId;
+    }
+
+    public static void setNextId(int nextId) {
+        Conta.nextId = nextId;
+    }
+
+    
     @Override
     public String toString() {
         return this.getIdentificador() + ":" + this.getDono() + ":" + this.getSaldo() + ":" + this.getTipo();
@@ -125,29 +142,41 @@ abstract class Conta {
 }
 
 class ContaCorrente extends Conta {
-
     public ContaCorrente(String idCliente) {
         this.setTipo("CC");
-        this.setIdentificador(nextId);
+        this.setIdentificador(ContaCorrente.getNextId());
         this.setDono(idCliente);
-        nextId++;
+        this.setSaldo(0);
+        ContaCorrente.setNextId(ContaCorrente.getNextId() + 1);
     }
 
+    @Override
+    void atualizar() {
+       this.setSaldo(this.getSaldo() - 20);
+    }
 }
 
 class ContaPoupanca extends Conta {
 
     public ContaPoupanca(String idCliente) {
         this.setTipo("CP");
-        this.setIdentificador(nextId);
+        this.setIdentificador(ContaCorrente.getNextId());
         this.setDono(idCliente);
-        nextId++;
+        this.setSaldo(0);
+        ContaCorrente.setNextId(ContaCorrente.getNextId() + 1);
     }
+
+    @Override
+    void atualizar() {
+        this.setSaldo(this.getSaldo() + this.getSaldo()/100);
+    }
+    
+    
 }
 
 class Cliente {
 
-    private String idCliente;
+    private final String idCliente;
     private ArrayList<Conta> contas;
 
     public String getIdCliente() {
@@ -185,13 +214,16 @@ public class Controller {
                 case "transf":
                     bradesco.transferir(Integer.parseInt(vetOption[1]), Integer.parseInt(vetOption[2]), Double.parseDouble(vetOption[3]));
                     break;
-                case "addCli":
+                case "adcCli":
                     bradesco.addCliente(vetOption[1]);
                     break;
-                case "show":
+                case "mostrarContas":
                     System.out.println(bradesco);
                     break;
-                case "end":
+                case "atualizar":
+                    bradesco.atualizar();
+                    break;
+                case "fim":
                     break OUTER;
                 default:
                     System.out.println("fail: comando inválido");
