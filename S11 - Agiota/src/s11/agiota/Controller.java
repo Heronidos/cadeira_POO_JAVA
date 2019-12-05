@@ -17,14 +17,32 @@ class Sistema {
         this.transacoes = new Repositorio("transacao");
         this.saldo = saldo;
     }
-    
-    public void emprestar(String chave, double valor){
+
+    public void emprestar(String chave, double valor) {
+        if (this.saldo < valor) {
+            //throw new RuntimeException("fail: fundos insuficientes");
+            System.out.println("fail: fundos insuficientes");
+        } else {
+            Transacao transacao = new Transacao(chave, valor);
+            this.saldo = this.saldo - valor;
+            this.clientes.get(chave).receber(valor);
+            this.clientes.get(chave).transacoes.add(transacao.getId(), transacao);
+            this.transacoes.add(transacao.getId(), transacao);
+        }
+    }
+
+    public void receber(String chave, double valor) {
+        valor = valor * -1;
         Transacao transacao = new Transacao(chave, valor);
         this.saldo = this.saldo - valor;
-        System.out.println(this.clientes.get(chave));
-        //this.clientes.get(chave).receber(valor);
+        this.clientes.get(chave).receber(valor);
         this.clientes.get(chave).transacoes.add(transacao.getId(), transacao);
         this.transacoes.add(transacao.getId(), transacao);
+
+    }
+
+    public String resumo() {
+        return this.clientes + "saldo : " + this.saldo;
     }
 }
 
@@ -96,60 +114,71 @@ class Cliente {
         this.saldo = saldo;
     }
 
-    public void receber(double valor){
+    public void receber(double valor) {
         this.saldo += valor;
     }
-    
+
     @Override
     public String toString() {
-        return this.clienteId + " : " + this.nome + ": " + this.saldo;
+        return this.clienteId + " : " + this.nome + " : " + this.saldo;
     }
 
 }
 
-class Repositorio<K, V>{
-	String typename;
-	Map<K, V> data = new TreeMap<K, V>();
-	public Repositorio(String typename) {
-		this.typename = typename;
-	}
-	
-	boolean exists(K k) {
-		return this.data.get(k) != null;
-	}
-	
-	void add(K k, V t) {
-		V value = this.data.get(k);
-		if(value != null){
-			throw new RuntimeException(this.typename + " " + k + " ja existe");
-                }else{
-                    this.data.put(k, t);
-                    System.out.println("done");
-                }
-	}
-	
-	V get(K k) {
-		V value = this.data.get(k);
-		if(value == null)
-			throw new RuntimeException(this.typename + " " + k + " nao existe");
-		return value;
-	}
-	
-	V remove(K k) {
-		V value = this.data.remove(k);
-		if(value == null)
-			throw new RuntimeException(this.typename + " " + k + " nao existe");
-		return value;
-	}
-	Collection<V> getAll(){
-		return this.data.values();
-	}
-	public String toString() {
-		String saida = "[ ";
-		for(K key : this.data.keySet())
-			saida += key + " ";
-		return saida + "]";
-	}
+class Repositorio<K, V> {
+
+    String typename;
+    Map<K, V> data;
+
+    public Repositorio(String typename) {
+        this.typename = typename;
+        this.data = new TreeMap();
+    }
+
+    boolean exists(K k) {
+        return this.data.get(k) != null;
+    }
+
+    void add(K k, V t) {
+        V value = this.data.get(k);
+        if (value != null) {
+            System.out.println(this.typename + " " + k + " ja existe");
+            //throw new RuntimeException(this.typename + " " + k + " ja existe");
+        } else {
+            this.data.put(k, t);
+            System.out.println("done");
+        }
+    }
+
+    V get(K k) {
+        V value = this.data.get(k);
+        if (value == null) {
+            System.out.println(data);
+            System.out.println(this.typename + " " + k + " nao existe");
+            //throw new RuntimeException(this.typename + " " + k + " nao existe");
+        }
+        return value;
+    }
+
+    V remove(K k) {
+        V value = this.data.remove(k);
+        if (value == null) {
+            throw new RuntimeException(this.typename + " " + k + " nao existe");
+        }
+        return value;
+    }
+
+    Collection<V> getAll() {
+        return this.data.values();
+    }
+
+    public String toString() {
+        String saida = "";
+        for (V v : this.getAll()) {
+            saida += v + "\n";
+        }
+        return saida;
+    }
 }
 
 public class Controller {
@@ -158,11 +187,23 @@ public class Controller {
 
         Scanner capInfor = new Scanner(in);
         String vetCapInfor[];
+        Sistema sistema = new Sistema(0);
+
+        /*Cliente cliente = new Cliente("Heronidos", "Heron Veríssimo");
+        sistema.clientes.add("Heronidos", cliente);
+        sistema.emprestar("Heronidos", 500);
+        sistema = new Sistema(1500);
+        sistema.clientes.add("Heronidos", cliente);
+        sistema.emprestar("Heronidos", 500);
+        System.out.println(sistema.clientes.get("Heronidos"));
+        System.out.println(sistema.transacoes);
+        System.out.println(sistema.clientes);*/
 
         OUTER:
         while (true) {
+
             vetCapInfor = (capInfor.nextLine().split(" "));
-            Sistema sistema = new Sistema(0);
+
             switch (vetCapInfor[0]) {
                 case "init":
                     sistema = new Sistema(Double.parseDouble(vetCapInfor[1]));
@@ -174,20 +215,20 @@ public class Controller {
                     }
                     sistema.clientes.add(vetCapInfor[1], new Cliente(vetCapInfor[1], nome));
                     break;
-                case "historico":
-                    //sistema.historico();
-                    break;
-                case "filtrar":
-
-                    break;
                 case "emprestar":
                     sistema.emprestar(vetCapInfor[1], Double.parseDouble(vetCapInfor[2]));
                     break;
-                case "receber":
-                    //sistema.receber(vetCapInfor[1], Double.parseDouble(vetCapInfor[2]));
+                case "resumo":
+                    System.out.println(sistema.resumo());
                     break;
-                case "mostrar":
-                    System.out.println(sistema.clientes);
+                case "historico":
+                    System.out.println(sistema.transacoes);
+                    break;
+                case "filtrar":
+                    System.out.println(sistema.clientes.get(vetCapInfor[1]).transacoes + "saldo: " + sistema.clientes.get(vetCapInfor[1]).getSaldo());
+                    break;
+                case "receber":
+                    sistema.receber(vetCapInfor[1], Double.parseDouble(vetCapInfor[2]));
                     break;
                 case "end":
                     break OUTER;
@@ -196,6 +237,7 @@ public class Controller {
 
             }
         }
+
     }
 
 }
