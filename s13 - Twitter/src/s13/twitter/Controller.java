@@ -156,7 +156,7 @@ class Usuario {
         String retorno = "";
         this.naoLidos = 0;
         for (Tweet t : timeLine.getAll()) {
-            retorno = t + "\n";
+            retorno += t + "\n";
         }
         return retorno;
     }
@@ -164,7 +164,7 @@ class Usuario {
     public String unRead() {
         String retorno = "";
         for (int i = this.timeLine.getAll().size() - this.naoLidos; i < this.timeLine.getAll().size(); i++) {
-            retorno = this.timeLine.getAll().get(i) + "\n";
+            retorno += this.timeLine.getAll().get(i) + "\n";
         }
         this.naoLidos = 0;
         return retorno;
