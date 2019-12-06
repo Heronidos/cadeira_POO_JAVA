@@ -1,6 +1,7 @@
 package s11.agiota;
 
 import static java.lang.System.in;
+import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Map;
 import java.util.Scanner;
@@ -127,49 +128,54 @@ class Cliente {
 
 class Repositorio<K, V> {
 
-    String typename;
-    Map<K, V> data;
+    String tipo;
+    Map<K, V> infor;
 
     public Repositorio(String typename) {
-        this.typename = typename;
-        this.data = new TreeMap();
+        this.tipo = typename;
+        this.infor = new TreeMap();
     }
 
     boolean exists(K k) {
-        return this.data.get(k) != null;
+        return this.infor.get(k) != null;
     }
 
-    void add(K k, V t) {
-        V value = this.data.get(k);
+    void add(K k, V v) {
+        V value = this.infor.get(k);
         if (value != null) {
-            System.out.println(this.typename + " " + k + " ja existe");
+            System.out.println(this.tipo + " " + k + " ja existe");
             //throw new RuntimeException(this.typename + " " + k + " ja existe");
         } else {
-            this.data.put(k, t);
+            this.infor.put(k, v);
             System.out.println("done");
         }
     }
 
     V get(K k) {
-        V value = this.data.get(k);
+        V value = this.infor.get(k);
         if (value == null) {
-            System.out.println(data);
-            System.out.println(this.typename + " " + k + " nao existe");
+            System.out.println(infor);
+            System.out.println(this.tipo + " " + k + " nao existe");
             //throw new RuntimeException(this.typename + " " + k + " nao existe");
         }
         return value;
     }
 
     V remove(K k) {
-        V value = this.data.remove(k);
+        V value = this.infor.remove(k);
         if (value == null) {
-            throw new RuntimeException(this.typename + " " + k + " nao existe");
+            System.out.println(this.tipo + " " + k + " nao existe");
+            //throw new RuntimeException(this.typename + " " + k + " nao existe");
         }
         return value;
     }
 
-    Collection<V> getAll() {
-        return this.data.values();
+    ArrayList<V> getAll() {
+        ArrayList<V> retorno = new ArrayList();
+        for (K chave : this.infor.keySet()) {
+            retorno.add(infor.get(chave));
+        }
+        return retorno;
     }
 
     public String toString() {
@@ -190,15 +196,14 @@ public class Controller {
         Sistema sistema = new Sistema(0);
 
         /*Cliente cliente = new Cliente("Heronidos", "Heron Veríssimo");
-        sistema.clientes.add("Heronidos", cliente);
-        sistema.emprestar("Heronidos", 500);
-        sistema = new Sistema(1500);
-        sistema.clientes.add("Heronidos", cliente);
-        sistema.emprestar("Heronidos", 500);
-        System.out.println(sistema.clientes.get("Heronidos"));
-        System.out.println(sistema.transacoes);
-        System.out.println(sistema.clientes);*/
-
+         sistema.clientes.add("Heronidos", cliente);
+         sistema.emprestar("Heronidos", 500);
+         sistema = new Sistema(1500);
+         sistema.clientes.add("Heronidos", cliente);
+         sistema.emprestar("Heronidos", 500);
+         System.out.println(sistema.clientes.get("Heronidos"));
+         System.out.println(sistema.transacoes);
+         System.out.println(sistema.clientes);*/
         OUTER:
         while (true) {
 
