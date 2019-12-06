@@ -1,217 +1,191 @@
-/*
- * To change this license header, choose License Headers in Project Properties.
- * To change this template file, choose Tools | Templates
- * and open the template in the editor.
- */
 package s13.twitter;
 
+import static java.lang.System.in;
 import java.util.ArrayList;
 import java.util.Map;
 import java.util.Scanner;
 import java.util.TreeMap;
 
-class Repositorio<K, T> {
+class Repositorio<K, V> {
 
-    Map<K, T> dados;
+    String tipo;
+    Map<K, V> infor;
 
-    public Repositorio() {
-        //this.nametype = nametype;
-        this.dados = new TreeMap<K, T>();
+    public Repositorio(String typename) {
+        this.tipo = typename;
+        this.infor = new TreeMap();
     }
 
-    public void add(K key, T t) {
-        if (dados.get(key) == null) {
-            dados.put(key, t);
+    boolean exists(K k) {
+        return this.infor.get(k) != null;
+    }
+
+    void add(K k, V v) {
+        V value = this.infor.get(k);
+        if (value != null) {
+            System.out.println(this.tipo + " " + k + " ja existe");
+            //throw new RuntimeException(this.typename + " " + k + " ja existe");
         } else {
-            throw new RuntimeException(key + " já existe");
+            this.infor.put(k, v);
+            System.out.println("done");
         }
     }
 
-    public T get(K key) {
-        if (dados.get(key) != null) {
-            return dados.get(key);
-        } else {
-            throw new RuntimeException(key + " não existe");
+    V get(K k) {
+        V value = this.infor.get(k);
+        if (value == null) {
+            System.out.println(infor);
+            System.out.println(this.tipo + " " + k + " nao existe");
+            //throw new RuntimeException(this.typename + " " + k + " nao existe");
         }
+        return value;
     }
 
-    public void del(K key) {
-        if (dados.get(key) != null) {
-            System.out.println("removendo " + key);
-            dados.remove(key);
-        } else {
-            throw new RuntimeException(" não existe");
+    V remove(K k) {
+        V value = this.infor.remove(k);
+        if (value == null) {
+            System.out.println(this.tipo + " " + k + " nao existe");
+            //throw new RuntimeException(this.typename + " " + k + " nao existe");
         }
+        return value;
     }
 
-    public ArrayList<T> getAll() {
-        ArrayList<T> out = new ArrayList<T>();
-        for (K key : dados.keySet()) {
-            out.add(dados.get(key));
+    ArrayList<V> getAll() {
+        ArrayList<V> retorno = new ArrayList();
+        for (K chave : this.infor.keySet()) {
+            retorno.add(infor.get(chave));
         }
-        return out;
+        return retorno;
     }
 
-    @Override
     public String toString() {
-        String out = "";
-
-        for (K k : dados.keySet()) {
-            out += dados.get(k);
+        String saida = "";
+        for (V v : this.getAll()) {
+            saida += v + "\n";
         }
-        out += "";
-        return out;
+        return saida;
     }
-
-}
-
-class Twitter {
-
-    Repositorio<String, Usuario> usuarios;
-    //Repositorio<Integer, Tweet> tweets;
-
-    Twitter() {
-        usuarios = new Repositorio<String, Usuario>();
-    }
-
-    public Repositorio<String, Usuario> getUsuarios() {
-        return usuarios;
-    }
-
-    public void seguir(String seguido, String seguidor) {
-        usuarios.get(seguido).getSeguidos().add(seguidor, usuarios.get(seguidor));
-
-        usuarios.get(seguidor).getSeguidores().add(seguido, usuarios.get(seguido));
-    }
-
-    public void twittar(String usuario, String msg) {
-        usuarios.get(usuario).getTweets().add(new Tweet(usuario, msg));
-    }
-
-    public void like(String likador, String user, int t) {
-        Tweet p = usuarios.get(user).getTweets().get(t);
-        String f = this.usuarios.get(likador).getId();
-        p.idLikadores.add(f);
-        p.setLikes(p.getLikes() + 1);
-    }
-
-}
-
-class Usuario {
-
-    Repositorio<String, Usuario> seguidores;
-    Repositorio<String, Usuario> seguidos;
-    String id;
-
-    ArrayList<Tweet> tweets;
-
-    public Usuario(String id) {
-        this.id = id;
-        this.seguidores = new Repositorio<String, Usuario>();
-        this.seguidos = new Repositorio<String, Usuario>();
-        this.tweets = new ArrayList<Tweet>();
-    }
-
-    public Repositorio<String, Usuario> getSeguidores() {
-        return seguidores;
-    }
-
-    public void setSeguidores(Repositorio<String, Usuario> seguidores) {
-        this.seguidores = seguidores;
-    }
-
-    public Repositorio<String, Usuario> getSeguidos() {
-        return seguidos;
-    }
-
-    public void setSeguidos(Repositorio<String, Usuario> seguidos) {
-        this.seguidos = seguidos;
-    }
-
-    public String getId() {
-        return id;
-    }
-
-    public void setId(String id) {
-        this.id = id;
-    }
-
-    @Override
-    public String toString() {
-        /*
-         return "" + this.id + "\n" + "  seguindo " + this.seguidos + "\n" + "  seguidores "
-         + this.seguidores + "\n";
-         */
-        String out = "\n    Seguidores [ ";
-        for (Usuario s : seguidores.getAll()) {
-            out += s.getId() + ", ";
-        }
-        out += "]\n    Seguidos [ ";
-        for (Usuario s : seguidos.getAll()) {
-            out += s.getId() + ", ";
-        }
-        return this.id + out + "]\n";
-    }
-
-    public ArrayList<Tweet> getTweets() {
-        return tweets;
-    }
-
-    public String timeLine() {
-        String out = " ";
-        int x = 0;
-        for (Tweet t : this.tweets) {
-            out += "[ " + x + " = " + t + ", ";
-            x++;
-        }
-        return this.id + out + "\n";
-
-    }
-
 }
 
 class Tweet {
 
-    String idUser;
-    String msg;
-    int likes;
+    static int nextId = 0;
+    private final int idTweet;
+    private final String userName;
+    private final String msg;
+    private ArrayList<String> likes;
 
-    ArrayList<String> idLikadores;
+    public Tweet(String userName, String msg) {
+        this.idTweet = nextId;
+        this.userName = userName;
+        this.msg = msg;
+        this.likes = new ArrayList<>();
+        nextId++;
+    }
+
+    public ArrayList<String> getLikes() {
+        return likes;
+    }
+
+    public void setLikes(ArrayList<String> likes) {
+        this.likes = likes;
+    }
+
+    public int getIdTweet() {
+        return idTweet;
+    }
+
+    public String getUserName() {
+        return userName;
+    }
 
     public String getMsg() {
         return msg;
     }
 
-    public void setMsg(String msg) {
-        this.msg = msg;
-    }
-
-    public String getIdUser() {
-        return idUser;
-    }
-
-    public void setIdUser(String idUser) {
-        this.idUser = idUser;
-    }
-
-    public Tweet(String idUser, String msg) {
-        this.idUser = idUser;
-        this.msg = msg;
-        this.likes = 0;
-        this.idLikadores = new ArrayList<String>();
+    public void darLike(String username) {
+        likes.add(username);
     }
 
     @Override
     public String toString() {
-        return msg + " / likes = " + likes + " /] " + idLikadores;
+        if (likes.size() > 0) {
+            String nomes = "";
+            for (String t : likes) {
+                nomes += t + " ";
+            }
+            return idTweet + ":" + userName + "( " + msg + " )" + "[ " + nomes + "]";
+        } else {
+            return idTweet + ":" + userName + "( " + msg + " )";
+        }
+
+    }
+}
+
+class Usuario {
+
+    private String nome;
+    private int naoLidos;
+    Repositorio<String, Usuario> seguidores;
+    Repositorio<String, Usuario> seguidos;
+    Repositorio<Integer, Tweet> meusTweets;
+    Repositorio<Integer, Tweet> timeLine;
+
+    public Usuario(String nome) {
+        this.nome = nome;
+        this.seguidores = new Repositorio<>("seguidor");
+        this.seguidos = new Repositorio<>("seguido");
+        this.meusTweets = new Repositorio<>("meu tweet");
+        this.timeLine = new Repositorio<>("timeline");
+
     }
 
-    public int getLikes() {
-        return likes;
+    public int getNaoLidos() {
+        return naoLidos;
     }
 
-    public void setLikes(int likes) {
-        this.likes = likes;
+    public void setNaoLidos(int naoLidos) {
+        this.naoLidos = naoLidos;
+    }
+
+    public String getNome() {
+        return nome;
+    }
+
+    public String timeLine() {
+        String retorno = "";
+        this.naoLidos = 0;
+        for (Tweet t : timeLine.getAll()) {
+            retorno = t + "\n";
+        }
+        return retorno;
+    }
+
+    public String unRead() {
+        String retorno = "";
+        for (int i = this.timeLine.getAll().size() - this.naoLidos; i < this.timeLine.getAll().size(); i++) {
+            retorno = this.timeLine.getAll().get(i) + "\n";
+        }
+        this.naoLidos = 0;
+        return retorno;
+    }
+
+    public String show() {
+        return this.nome + "\n  seguidores [ " + seguidores.toString().replaceAll("\n", " ") + "]" + "\n  seguidos [ " + seguidos.toString().replaceAll("\n", " ") + "]";
+    }
+
+    public void twittar(Tweet tweet) {
+        this.meusTweets.add(tweet.getIdTweet(), tweet);
+        for (Usuario seguidor : this.seguidores.getAll()) {
+            seguidor.setNaoLidos(seguidor.getNaoLidos() + 1);
+            seguidor.timeLine.add(tweet.getIdTweet(), tweet);
+        }
+        System.out.println("done");
+    }
+
+    @Override
+    public String toString() {
+        return this.nome;
     }
 
 }
@@ -219,17 +193,67 @@ class Tweet {
 public class Controller {
 
     public static void main(String[] args) {
-        Twitter twitter = new Twitter();
+        Repositorio<String, Usuario> usuarios = new Repositorio<>("usuario");
+        Repositorio<Integer, Tweet> timeLine = new Repositorio<>("tweets");
 
-        twitter.usuarios.add("Jacquin", new Usuario("Jacquin"));
-        twitter.usuarios.add("Tompero", new Usuario("Tompero"));
-        twitter.seguir("Jacquin", "Tompero");
-        twitter.seguir("Tompero", "Jacquin");
+        /*
+         usuarios.add("Heron", new Usuario("Heron"));
+         usuarios.add("Amorim", new Usuario("Amorim"));
+         usuarios.add("Aley", new Usuario("Aley"));
+         usuarios.add("Heron", new Usuario("Heron"));
 
-        twitter.twittar("Jacquin", "Só falta você sz");
-        twitter.like("Tompero", "Jacquin", 0);
-        System.out.println(twitter.usuarios.get("Jacquin").timeLine());
-        System.out.println(twitter.usuarios.get("Tompero").timeLine());
+         usuarios.get("Heron").seguidos.add("Amorim", usuarios.get("Amorim"));
+         usuarios.get("Amorim").seguidores.add("Heron", usuarios.get("Heron"));
+
+         Tweet tweet2 = new Tweet("Amorim", "Iae glr gay");
+         usuarios.get("Amorim").twittar(tweet2);
+         timeLine.add(tweet2.getIdTweet(), tweet2);
+
+         System.out.println(usuarios.get("Heron").show());
+         */
+        Scanner captInfor = new Scanner(in);
+
+        OUTER:
+        while (true) {
+            String vetCapInfor[] = captInfor.nextLine().split(" ");
+            switch (vetCapInfor[0]) {
+                case "addUser":
+                    usuarios.add(vetCapInfor[1], new Usuario(vetCapInfor[1]));
+                    break;
+                case "show":
+                    for (Usuario u : usuarios.getAll()) {
+                        System.out.println(u.show());
+                    }
+                    break;
+                case "follow":
+                    usuarios.get(vetCapInfor[1]).seguidos.add(vetCapInfor[2], usuarios.get(vetCapInfor[2]));
+                    usuarios.get(vetCapInfor[2]).seguidores.add(vetCapInfor[1], usuarios.get(vetCapInfor[1]));
+                    break;
+                case "twittar":
+                    String mensagem = "";
+                    for (int i = 2; i < vetCapInfor.length; i++) {
+                        mensagem += vetCapInfor[i] + " ";
+                    }
+                    Tweet tweet = new Tweet(vetCapInfor[1], mensagem);
+                    usuarios.get(vetCapInfor[1]).twittar(tweet);
+                    timeLine.add(tweet.getIdTweet(), tweet);
+                    break;
+                case "timeline":
+                    System.out.println(usuarios.get(vetCapInfor[1]).timeLine());
+                    break;
+                case "unread":
+                    System.out.println(usuarios.get(vetCapInfor[1]).unRead());
+                    break;
+                case "like":
+                    timeLine.get(Integer.parseInt(vetCapInfor[2])).darLike(usuarios.get(vetCapInfor[1]).getNome());
+                    break;
+                case "end":
+                    break OUTER;
+                default:
+                    System.out.println("fail: comando inválido");
+                    break;
+            }
+
+        }
     }
-
 }
